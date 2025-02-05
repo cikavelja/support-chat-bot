@@ -1,0 +1,41 @@
+
+
+.chat-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.message {
+  margin: 5px 0;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #e0f7fa;
+}
+
+.user-message {
+  background-color: #ffcdd2;
+}
+
+.input-group {
+  display: flex;
+}
+
+.form-control {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}

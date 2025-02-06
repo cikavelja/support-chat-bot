@@ -4,17 +4,22 @@ import * as signalR from '@microsoft/signalr';
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState('');
+  const [connectionId, setConnectionId] = useState(null); // Store SignalR connection ID
   const chatContainerRef = useRef(null);
-  let connection = useRef(null);
+  const connection = useRef(null);
 
   useEffect(() => {
     connection.current = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5140/supportHub') // Update URL if needed
+      .withUrl('http://localhost:5140/supportHub') // Ensure this matches your backend
       .withAutomaticReconnect()
       .build();
 
     connection.current.start()
-      .then(() => console.log('Connected to SignalR'))
+      .then(() => {
+        console.log('Connected to SignalR');
+        setConnectionId(connection.current.connectionId); // Store the connection ID
+        console.log('Connection ID:', connection.current.connectionId);
+      })
       .catch(err => console.error('Error while starting connection:', err));
 
     connection.current.on('ReceiveMessage', (message) => {
@@ -28,7 +33,7 @@ const Chat = () => {
 
   const sendMessage = () => {
     const trimmedInput = userInput.trim();
-    if (trimmedInput !== '') {
+    if (trimmedInput !== '' && connectionId) {
       addMessage(trimmedInput, true);
       sendMessageToServer(trimmedInput);
       setUserInput('');
@@ -45,12 +50,24 @@ const Chat = () => {
   };
 
   const sendMessageToServer = async (message) => {
+    if (!connectionId) {
+      console.error('No connection ID available. Cannot send message.');
+      return;
+    }
+
     try {
-      await fetch('http://localhost:5140/api/support/query', {
+      const response = await fetch('http://localhost:5140/api/support/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(message)
+        body: JSON.stringify({
+          userPrompt: message,
+          connectionId: connectionId // Pass connection ID to identify user
+        })
       });
+
+      if (!response.ok) {
+        console.error('Error sending message:', response.statusText);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     }

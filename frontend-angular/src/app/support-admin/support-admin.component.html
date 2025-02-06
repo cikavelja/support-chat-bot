@@ -1,0 +1,14 @@
+<div class="support-form">
+    <h2>Add Support Topic</h2>
+  
+    <label for="title">Title:</label>
+    <input id="title" [(ngModel)]="title" placeholder="Enter title" />
+  
+    <label for="description">Description:</label>
+    <textarea id="description" [(ngModel)]="description" placeholder="Enter description"></textarea>
+  
+    <button (click)="addSupportTopic()">Submit</button>
+  
+    <p class="message">{{ message }}</p>
+  </div>
+  

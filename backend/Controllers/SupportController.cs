@@ -1,9 +1,9 @@
 using Google.Protobuf.Collections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.AI;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
+using Microsoft.Extensions.AI;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,20 +15,20 @@ public class SupportController : ControllerBase
     public SupportController(IHubContext<SupportHub> hubContext, QdrantClient qdrantClient)
     {
         _hubContext = hubContext;
-        _qdrantClient = qdrantClient; // Injected via dependency injection
+        _qdrantClient = qdrantClient;
     }
 
     [HttpPost("query")]
-    public async Task<IActionResult> QuerySupport([FromBody] string userPrompt)
+    public async Task<IActionResult> QuerySupport([FromBody] SupportQueryRequest request)
     {
         try
         {
-            var normalizedQuery = userPrompt.ToLower().Trim();
+            var normalizedQuery = request.UserPrompt.ToLower().Trim();
 
             var generator = new OllamaEmbeddingGenerator(new Uri("http://localhost:11434/"), "all-minilm");
             var userEmbedding = await generator.GenerateEmbeddingVectorAsync(normalizedQuery);
 
-            var searchResults = await _qdrantClient.SearchAsync( 
+            var searchResults = await _qdrantClient.SearchAsync(
                 collectionName: "support_topics",
                 vector: userEmbedding.ToArray(),
                 limit: 10
@@ -42,19 +42,19 @@ public class SupportController : ControllerBase
             foreach (var result in filteredResults)
             {
                 var description = ExtractPayloadString(result.Payload, "Description");
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", description);
+                await _hubContext.Clients.Client(request.ConnectionId).SendAsync("ReceiveMessage", description);
             }
 
             if (!filteredResults.Any())
             {
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "No matches found. Please contact support@xyzcompany.com.");
+                await _hubContext.Clients.Client(request.ConnectionId).SendAsync("ReceiveMessage", "No matches found. Please contact support@xyzcompany.com.");
             }
 
             return Ok();
         }
         catch (Exception ex)
         {
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", $"Error: {ex.Message}");
+            await _hubContext.Clients.Client(request.ConnectionId).SendAsync("ReceiveMessage", $"Error: {ex.Message}");
             return StatusCode(500, ex.Message);
         }
     }
@@ -65,4 +65,11 @@ public class SupportController : ControllerBase
             ? value.StringValue
             : "No description available";
     }
+}
+
+// Request model to include user prompt and connection ID
+public class SupportQueryRequest
+{
+    public required string UserPrompt { get; set; }
+    public required string ConnectionId { get; set; }
 }

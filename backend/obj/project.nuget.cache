@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "XDc3zJRGbJA=",
+  "dgSpecHash": "sdVYP03Faig=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Administrator\\Documents\\AI\\clone1\\support-chat-bot\\backend\\SupportAssistantApi.csproj",
+  "projectFilePath": "C:\\Users\\Administrator\\Documents\\AI\\clone 2\\support-chat-bot\\backend\\SupportAssistantApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Administrator\\.nuget\\packages\\google.protobuf\\3.29.3\\google.protobuf.3.29.3.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\grpc.core.api\\2.67.0\\grpc.core.api.2.67.0.nupkg.sha512",

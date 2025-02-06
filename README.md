@@ -54,9 +54,13 @@ ollama list
 Qdrant is used as a **vector database** to store and retrieve support topics efficiently.
 
 ### **Using Docker**
+Pull Qdrant using the following command:
+```sh
+docker pull qdrant/qdrant
+```
 Run Qdrant using the following command:
 ```sh
-docker run -d --name qdrant -p 6334:6334 qdrant/qdrant
+docker run -p 6333:6333 -p 6334:6334  -v qdrant_storage:/qdrant/storage qdrant/qdrant
 ```
 
 Check if Qdrant is running:
